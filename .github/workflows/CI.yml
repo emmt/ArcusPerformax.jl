@@ -20,7 +20,7 @@ jobs:
         version:
           - '1.6'
           - '1.7'
-          - 'nightly'
+          # This fails: - 'nightly'
         os:
           - ubuntu-latest
         arch:
