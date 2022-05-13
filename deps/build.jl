@@ -13,10 +13,8 @@ function build_deps(deps_dir::AbstractString, driver_dir::AbstractString)
     cd(deps_dir)
     options = load_options(joinpath(deps_dir, "generator.toml"))
     args = get_default_args()
+    push!(args, "-Dlibusb_device_handle=void")
     push!(args, "-I$(driver_dir)")
-    for str in readlines(`pkg-config libusb-1.0 --cflags`)
-        push!(args, str)
-    end
     ctx = create_context(headers, args, options)
     build!(ctx)
 

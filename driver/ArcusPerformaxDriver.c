@@ -1,3 +1,6 @@
+//libusb standard header file
+#include <libusb.h>
+
 #include "ArcusPerformaxDriver.h"
 
 #ifdef DEBUGARCUS
@@ -30,7 +33,7 @@ int _is_performax_device(struct libusb_device_descriptor *descriptor) {
     return _is_performax_device_by_vendor_product(descriptor->idVendor, descriptor->idProduct);
 }
 
-// Iterate through the list of usb devices present and count the number of 
+// Iterate through the list of usb devices present and count the number of
 // devices that we could use (based on returning true to _is_performax_device)
 
 AR_BOOL fnPerformaxComGetNumDevices(AR_DWORD *numDevices) {
@@ -48,7 +51,7 @@ AR_BOOL fnPerformaxComGetNumDevices(AR_DWORD *numDevices) {
 
 
     for (i = 0; i < device_count; i++) {
-    
+
         if (0 == libusb_get_device_descriptor(list[i], &descriptor)) {
             if ( _is_performax_device(&descriptor) ) {
                 (*numDevices) ++ ;
@@ -64,12 +67,12 @@ AR_BOOL fnPerformaxComGetNumDevices(AR_DWORD *numDevices) {
 // Return a libusb_device_descriptor for the device given by the dwNumDevice offset.
 // On success, the offset number in the libusb_device list is returned.
 // On error, -1 is returned.
-int _get_libusb_device_offset_from_arcos_offset(libusb_device **list, ssize_t list_count, 
+int _get_libusb_device_offset_from_arcos_offset(libusb_device **list, ssize_t list_count,
 	 struct libusb_device_descriptor *descriptor, AR_DWORD dwNumDevice) {
 int i;
 
     for (i = 0; i < list_count; i++) {
-        // iterate through each device and find a perfmax device: 
+        // iterate through each device and find a perfmax device:
         if (0 == libusb_get_device_descriptor(list[i], descriptor)) {
             if ( _is_performax_device(descriptor) ) {
                 if (dwNumDevice) {
@@ -162,7 +165,7 @@ AR_BOOL fnPerformaxComOpen(AR_DWORD dwDeviceNum, AR_HANDLE *device_handle) {
     } else {
        if (0 != libusb_open(list[i], device_handle) ) {
            result = AR_FALSE; // libusb_open error
-       } 
+       }
        if (0 != libusb_claim_interface(*device_handle, 0) ) {
            result = AR_FALSE; // libusb_open error
        }
@@ -266,4 +269,3 @@ AR_BOOL InitializePerformaxLibrary(AR_VOID) {
 
     return AR_FALSE;
 }
-
