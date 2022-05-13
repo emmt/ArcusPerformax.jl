@@ -213,7 +213,7 @@ AR_BOOL fnPerformaxComSendRecv(AR_HANDLE device_handle, AR_VOID *wBuffer, AR_DWO
 
 int transferred;
 int result;
-char buffer[4096];
+unsigned char buffer[4096];
 
     // clear any outstanding reads:
     result = libusb_bulk_transfer(device_handle, 0x82, buffer, sizeof(buffer), &transferred, libusb_ReadTimeout);
