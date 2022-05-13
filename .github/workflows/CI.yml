@@ -28,6 +28,8 @@ jobs:
           - x86
     steps:
       - uses: actions/checkout@v2
+      - name: Install libusb
+        run: sudo apt-get install libusb-1.0-0-dev
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
