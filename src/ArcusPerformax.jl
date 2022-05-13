@@ -10,4 +10,18 @@ let file = joinpath(@__DIR__, "..", "deps", "deps.jl")
     include(file)
 end
 
+"""
+    ArcusPerformax.GetNumDevices()
+
+yields the number of devices.
+
+"""
+function GetNumDevices()
+    num = Ref{Driver.AR_DWORD}()
+    status = Drivers.fnPerformaxComGetNumDevices(num)
+    status == 0 && error(
+        "error $status in fnPerformaxComGetNumDevices")
+    return num[]
+end
+
 end
