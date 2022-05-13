@@ -18,7 +18,7 @@ yields the number of devices.
 """
 function GetNumDevices()
     num = Ref{Driver.AR_DWORD}()
-    status = Drivers.fnPerformaxComGetNumDevices(num)
+    status = Driver.fnPerformaxComGetNumDevices(num)
     status == 0 && error(
         "error $status in fnPerformaxComGetNumDevices")
     return num[]
