@@ -1,0 +1,13 @@
+name = "ArcusPerformax"
+uuid = "86c6b398-e7f6-4237-a185-b5d3f59d0094"
+authors = ["Éric Thiébaut <eric.thiebaut@univ-lyon1.fr> and contributors"]
+version = "0.3.0"
+
+[compat]
+julia = "1.5"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
