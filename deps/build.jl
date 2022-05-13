@@ -3,7 +3,18 @@ using Clang.Generators
 using Clang.LibClang.Clang_jll
 
 function build_deps(deps_dir::AbstractString, driver_dir::AbstractString)
-    # Dynamic library file.
+    # Build dynamic library file.
+    old_dir = pwd()
+    try
+        cd(joinpath(deps_dir, "../driver"))
+        run(`make clean all`)
+    catch ex
+        throw(ex)
+    finally
+        cd(old_dir)
+    end
+
+    # Path to dynamic library file.
     driver_file = joinpath(driver_dir, "ArcusPerformaxDriver.$(Libdl.dlext)")
 
     # Header file(s).
