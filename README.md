@@ -3,16 +3,23 @@
 
 # Installation
 
-1. Clone or update (`git pull -r`) repository.
+1. Prerequisites: you need `libusb` (1.0) installed with its headers.  On
+   Ubuntu-like system, this can be done by:
 
-2. Compile driver (warning messages are expected):
+   ```{.sh}
+   sudo apt install libusb-1.0-0-dev
+   ```
+
+2. Clone or update (`git pull -r`) repository.
+
+3. Compile driver:
 
    ```{.sh}
    cd ArcusPerformax.jl/driver
    make
    ```
 
-3. Compile driver (warning messages are expected):
+4. Compile driver:
 
    ```{.sh}
    cd ../deps
