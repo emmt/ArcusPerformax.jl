@@ -1,7 +1,7 @@
 name = "ArcusPerformax"
 uuid = "86c6b398-e7f6-4237-a185-b5d3f59d0094"
 authors = ["Éric Thiébaut <eric.thiebaut@univ-lyon1.fr> and contributors"]
-version = "0.3.0"
+version = "0.1.0"
 
 [deps]
 Clang = "40e3b903-d033-50b4-a0cc-940c62c95e31"
