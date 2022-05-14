@@ -82,22 +82,29 @@ function (dev::Device)(cmd::AbstractString)
     len = 64 # buffers must have 64 bytes
     inp = zeros(UInt8, len)
     out = zeros(UInt8, len)
-    k = 0
+    i = 0
     for c in cmd
         if ((c < '\0') | (c > '\x7f'))
             throw(ArgumentError("non-ASCII character in command"))
         end
-        k += 1
-        if k ≥ len
+        i += 1
+        if i ≥ len
             throw(ArgumentError("command is too long"))
         end
-        inp[k] = c
+        inp[i] = c
     end
     if Driver.fnPerformaxComSendRecv(handle(dev), inp, len, len, out) != 0
         error("error in call to `fnPerformaxComSendRecv`")
     end
-    out[len] = 0
-    return unsafe_string(pointer(out))
+    i = 0
+    while i < len
+        i += 1
+        out[i] < 0x80 || error("non-ASCII character in result")
+        if out[i] == 0x00
+            return unsafe_string(pointer(out))
+        end
+    end
+    error("result is too long")
 end
 
 """
