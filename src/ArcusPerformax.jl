@@ -79,9 +79,9 @@ function (dev::Device)(cmd::AbstractString)
     if handle(dev) == NULL
         error("connection to device has been closed")
     end
-    siz = 64 # buffers must have 64 bytes
-    inp = Array{UInt8}(undef, siz)
-    out = Array{UInt8}(undef, siz)
+    len = 64 # buffers must have 64 bytes
+    inp = zeros(UInt8, len)
+    out = zeros(UInt8, len)
     k = 0
     for c in cmd
         if ((c < '\0') | (c > '\x7f'))
@@ -93,11 +93,10 @@ function (dev::Device)(cmd::AbstractString)
         end
         inp[k] = c
     end
-    inp[k+1] = 0
-    if Driver.fnPerformaxComSendRecv(handle(dev), inp, siz, siz, out) != 0
+    if Driver.fnPerformaxComSendRecv(handle(dev), inp, len, len, out) != 0
         error("error in call to `fnPerformaxComSendRecv`")
     end
-    out[siz] = 0
+    out[len] = 0
     return unsafe_string(pointer(out))
 end
 
@@ -160,6 +159,11 @@ function get_product_string(num::Integer, id::Integer)
     buf[siz] = 0
     # NOTE: First character is set to '?' in case of errors.
     return unsafe_string(pointer(buf))
+end
+
+function __init__()
+    # Set default timeouts.
+    set_timeouts()
 end
 
 end # module
