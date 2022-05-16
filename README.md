@@ -10,19 +10,19 @@ based on the Linux driver which is downloadable
 
 To load the package, call:
 
-```{.jl}
+```julia
 using ArcusPerformax
 ```
 
 To retrieve the number of connected Arcus-Performax devices, call:
 
-```{.jl}
+```julia
 ArcusPerformax.count_devices()
 ```
 
 To set the read/write timeouts for subsequent data transfers, call:
 
-```{.jl}
+```julia
 ArcusPerformax.set_timeouts(; rd=..., wr=...)
 ```
 
@@ -31,7 +31,7 @@ for reading and writing.
 
 To find the Arcus-Performax device whose number if `devnum`, call:
 
-```{.jl}
+```julia
 ArcusPerformax.find_device(devnum)
 ```
 
@@ -39,14 +39,14 @@ which returns a null USB device pointer if no matching device is found.
 
 To open the Arcus-Performax device whose number if `devnum`, call:
 
-```{.jl}
+```julia
 ArcusPerformax.Device(devnum)
 ```
 
 The returned object, say `dev`, may be then directly called to send commands
 (results are returned as strings):
 
-```{.jl}
+```julia
 res = dev(cmd)
 ```
 
@@ -58,7 +58,7 @@ See file [`src/example.jl`](src/example.jl) for an example of usage.
 Installing and building the package is as simple as typing the following
 commands in Julia:
 
-```{.jl}
+```julia
 using Pkg
 pkg"add https://github.com/emmt/LibUSB.jl"
 pkg"add https://github.com/emmt/ArcusPerformax.jl"
