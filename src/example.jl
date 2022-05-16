@@ -1,27 +1,27 @@
 using ArcusPerformax
 
-function test_device(num::Integer = 0)
+function test_device(devnum::Integer = 0)
 
     # Private function to check whether motor is still moving.
     is_moving(str::AbstractString) = length(res) < 1 || res[1] != 'O'
 
     # acquire information
-    numdev = ArcusPerformax.get_num_devices()
-    if numdev < 1
+    count = ArcusPerformax.count_devices()
+    if count < 1
         println("No motor found")
 	return
     end
     try
-        println("Serial Number: ", ArcusPerformax.get_serial_number(num))
+        println("Serial Number: ", ArcusPerformax.get_serial_number(devnum))
     catch
     end
     try
-        println("Description: ", ArcusPerformax.get_description(num))
+        println("Description: ", ArcusPerformax.get_description(devnum))
     catch
     end
 
     # Open device (no needs to flush).
-    dev = ArcusPerformax.Device(num)
+    dev = ArcusPerformax.Device(devnum)
 
     # Setup connection timeouts.
     ArcusPerformax.set_timeouts(rd=5_000, wr=5_000)

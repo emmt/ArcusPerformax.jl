@@ -2,4 +2,5 @@
 *.jl.*.cov
 *.jl.cov
 *.jl.mem
+driver/
 /Manifest.toml
