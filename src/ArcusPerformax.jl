@@ -1,7 +1,7 @@
 module ArcusPerformax
 
 using LibUSB
-using LibUSB: Low, null, is_null, get_device_descriptor
+using LibUSB: Low, null, is_null, get_device_descriptor, throw_libusb_error
 
 # These constants are defined by Arcus.
 const PERFORMAX_RETURN_SERIAL_NUMBER = 0x0
@@ -56,10 +56,10 @@ struct Device
         handle = open(devptr)
         is_supported_device(handle) || throw(ArgumentError(
             "not a Performax USB device"))
-        code = libusb_claim_interface(handle, 0)
+        code = Low.libusb_claim_interface(handle, 0)
         if code != 0
             close(handle)
-            throw(LibUSBError(:libusb_claim_interface, code))
+            throw_libusb_error(:libusb_claim_interface, code)
         end
         code = _send_urb_control(handle, URB_OPEN)
         if code == 0
@@ -70,7 +70,7 @@ struct Device
         if code != 0
             Low.libusb_release_interface(handle, 0)
             close(handle)
-            throw(LibUSBError(:libusb_control_transfer, code))
+            throw_libusb_error(:libusb_control_transfer, code)
         end
         return finalizer(_close, new(handle))
     end
@@ -87,7 +87,7 @@ handle(dev::Device) = getfield(dev, :handle)
 
 function Base.flush(dev::Device)
     code = _send_urb_control(dev, URB_FLUSH)
-    code == 0 || throw(LibUSBError(:libusb_control_transfer, code))
+    code == 0 || throw_libusb_error(:libusb_control_transfer, code)
     return dev
 end
 
@@ -98,10 +98,10 @@ function _close(dev::Device; throwerrors::Bool = false)
     code2 = Low.libusb_release_interface(handle(dev), 0)
     close(handle(dev)) # this function never throws
     if throwerrors && code1 != 0
-        throw(LibUSBError(:libusb_control_transfer, code1))
+        throw_libusb_error(:libusb_control_transfer, code1)
     end
     if throwerrors && code2 != 0
-        throw(LibUSBError(:libusb_release_interface, code2))
+        throw_libusb_error(:libusb_release_interface, code2)
     end
     return nothing
 end
@@ -134,14 +134,14 @@ function (dev::Device)(cmd::AbstractString)
     buf[i] = 0
 
     # Send bytes to write.
-    code = libusb_bulk_transfer(handle(dev), 0x02, buf, len,
-                                transferred, write_timeout[])
-    code == 0 || throw(LibUSBError(:libusb_bulk_transfer, code))
+    code = Low.libusb_bulk_transfer(handle(dev), 0x02, buf, len,
+                                    transferred, write_timeout[])
+    code == 0 || throw_libusb_error(:libusb_bulk_transfer, code)
 
     # Receive bytes to read.
-    code = libusb_bulk_transfer(handle(dev), 0x82, buf, len,
-                                transferred, read_timeout[])
-    code == 0 || throw(LibUSBError(:libusb_bulk_transfer, code))
+    code = Low.libusb_bulk_transfer(handle(dev), 0x82, buf, len,
+                                    transferred, read_timeout[])
+    code == 0 || throw_libusb_error(:libusb_bulk_transfer, code)
 
     # Convert received bytes in a string.
     for i in 1:len
@@ -270,13 +270,13 @@ const URB_CLOSE = 0x04 # close command
 _send_urb_control(dev::Device, id::Integer) = _send_urb_control(handle(dev), id)
 _send_urb_control(handle::LibUSB.DeviceHandle, id::Integer) =
     Low.libusb_control_transfer(
-        handle,
-        0x40, # bmRequestType
-        0x02, # bRequest,
-        id,   # wValue,
-        0x00, # wIndex,
-        NULL, # data,
-        0,    # wLength,
+        handle,         # dev_handle
+        0x40,           # request_type
+        0x02,           # bRequest,
+        id,             # wValue,
+        0x00,           # wIndex,
+        Ptr{Cuchar}(0), # data,
+        0,              # wLength,
         write_timeout[])
 
 end # module
