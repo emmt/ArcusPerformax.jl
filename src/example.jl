@@ -2,9 +2,6 @@ using ArcusPerformax
 
 function test_device(devnum::Integer = 0)
 
-    # Private function to check whether motor is still moving.
-    is_moving(str::AbstractString) = length(res) < 1 || res[1] != 'O'
-
     # acquire information
     count = ArcusPerformax.count_devices()
     if count < 1
@@ -50,25 +47,19 @@ function test_device(devnum::Integer = 0)
     println("Motor is moving. Please wait.\n")
 
     for i in 1:2
-	while true
-	    res = dev("X-1000") # move the motor
-	    # wait and retry while motor is still moving.
+        # move the motor to some position
+	while dev("X-1000") != "OK"
+	    # motor is still moving, wait before retrying
             sleep(1.0)
-            if !is_moving(res)
-                break
-            end
         end
-	while true
-	    res = dev("X1000") # move the motor
-	    # wait and retry while motor is still moving.
+        sleep(1.0)
+        # move the motor in other direction
+	while dev("X1000") != "OK"
+	    # motor is still moving, wait before retrying
             sleep(1.0)
-            if !is_moving(res)
-                break
-            end
 	end
-
+        sleep(1.0)
     end
-    sleep(1.0)
     dev("J-") # move the motor at constant speed
     sleep(10.0)
     dev("STOP") # stop the motor
