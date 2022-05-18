@@ -108,7 +108,7 @@ end
 
 # Use the device as a function to send commands.
 function (dev::Device)(cmd::AbstractString)
-    is_null(handle(dev)) && error("connection to device has been closed")
+    isopen(handle(dev)) && error("connection to device has been closed")
 
     len = 64 # i/o transfer are 64 bytes in size
     transferred = Ref{Cint}()
