@@ -49,7 +49,7 @@ For example:
     close(dev) # this is not mandatory
 
 """
-struct Device
+mutable struct Device
     # This is just a thin wrapper over a LibUSB.DeviceHandle.
     handle::LibUSB.DeviceHandle
     function Device(devptr::LibUSB.DevicePointer)
