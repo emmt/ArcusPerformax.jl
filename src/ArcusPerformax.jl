@@ -33,8 +33,8 @@ end
 
 opens Arcus-Performax USB device number `devnum` and returns an object
 connected to this device.  The connection is automatically closed when the
-returned object s garbage collected.  It is thus not needed to call the `close`
-method on the object.
+returned object is garbage collected.  It is thus not mandatory to call the
+`close` method on the object.
 
 The returned object can be used as a function to send a command (the result is
 a string):
@@ -46,7 +46,7 @@ For example:
     dev = ArcusPerformax.Device(devnum);
     println("Device Number: ", dev("DN"))
     println("Product Identifier: ", dev("ID"))
-    close(dev) # this is not mandatory
+    close(dev) # ok but not mandatory
 
 """
 mutable struct Device
@@ -55,7 +55,7 @@ mutable struct Device
     function Device(devptr::LibUSB.DevicePointer)
         handle = open(devptr)
         is_supported_device(handle) || throw(ArgumentError(
-            "not a Performax USB device"))
+            "not an Arcus Performax USB device"))
         code = Low.libusb_claim_interface(handle, 0)
         if code != 0
             close(handle)
@@ -68,6 +68,7 @@ mutable struct Device
             code = _send_urb_control(handle, URB_FLUSH)
         end
         if code != 0
+            # Sending one of the 2 URB control sequences has failed.
             Low.libusb_release_interface(handle, 0)
             close(handle)
             throw_libusb_error(:libusb_control_transfer, code)
@@ -82,7 +83,6 @@ function Device(devnum::Integer)
     return Device(devptr)
 end
 
-number(dev::Device) = getfield(dev, :number)
 handle(dev::Device) = getfield(dev, :handle)
 
 function Base.flush(dev::Device)
@@ -108,11 +108,11 @@ end
 
 # Use the device as a function to send commands.
 function (dev::Device)(cmd::AbstractString)
-    isopen(handle(dev)) && error("connection to device has been closed")
+    isopen(handle(dev)) || error("connection to device has been closed")
 
     len = 64 # i/o transfer are 64 bytes in size
     transferred = Ref{Cint}()
-    buf = Array{UInt8}(undef, 4096) # big enough buffer for flusing
+    buf = Array{UInt8}(undef, 4096) # big enough buffer for flushing
 
     # Clear any outstanding reads.  If this fails, it's probably ok.  We
     # probably don't care.
@@ -131,7 +131,7 @@ function (dev::Device)(cmd::AbstractString)
         end
         buf[i] = c
     end
-    buf[i] = 0
+    buf[i+1] = 0
 
     # Send bytes to write.
     code = Low.libusb_bulk_transfer(handle(dev), 0x02, buf, len,
@@ -195,7 +195,7 @@ yields the string identified by `id` for Arcus-Performax device number `devnum`.
 
 """
 function get_product_string(devnum::Integer, id::Integer)
-    device = get_performax_device(devnum)
+    device = find_device(devnum)
     if is_null(device)
         throw(ArgumentError("device not found"))
     end
@@ -212,8 +212,8 @@ function get_product_string(devnum::Integer, id::Integer)
         end
         code = Low.libusb_get_string_descriptor_ascii(
             handle, idx, buf, sizeof(buf))
-        code == 0 || throw(LibUSBError(
-            :libusb_get_string_descriptor_ascii, code))
+        code == 0 || throw_libusb_error(
+            :libusb_get_string_descriptor_ascii, code)
     finally
         close(handle)
     end
