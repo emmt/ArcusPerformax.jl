@@ -29,7 +29,7 @@ ArcusPerformax.set_timeouts(; rd=..., wr=...)
 with keywords `rd` and `wr` used to specify the timeouts (in milliseconds)
 for reading and writing.
 
-To find the Arcus-Performax device whose number if `devnum`, call:
+To find the Arcus-Performax device whose number is `devnum`, call:
 
 ```julia
 ArcusPerformax.find_device(devnum)
@@ -37,7 +37,7 @@ ArcusPerformax.find_device(devnum)
 
 which returns a null USB device pointer if no matching device is found.
 
-To open the Arcus-Performax device whose number if `devnum`, call:
+To open the Arcus-Performax device whose number is `devnum`, call:
 
 ```julia
 ArcusPerformax.Device(devnum)
