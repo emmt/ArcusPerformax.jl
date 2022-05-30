@@ -1,12 +1,13 @@
 name = "ArcusPerformax"
 uuid = "86c6b398-e7f6-4237-a185-b5d3f59d0094"
 authors = ["Éric Thiébaut <eric.thiebaut@univ-lyon1.fr> and contributors"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 LibUSB = "1afde568-c220-478b-8c78-633644781b80"
 
 [compat]
+LibUSB = "0.1"
 julia = "1.6"
 
 [extras]
