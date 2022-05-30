@@ -171,55 +171,38 @@ function count_devices()
 end
 
 """
-    ArcusPerformax.get_serial_number(devnum)
+    ArcusPerformax.list_devices([io=stdout,][list])
 
-yields the serial number of device number `devnum`.
-
-"""
-get_serial_number(devnum::Integer) =
-    get_product_string(devnum, PERFORMAX_RETURN_SERIAL_NUMBER)
+lists connected Arcus-Performax devices.
 
 """
-    ArcusPerformax.get_description(devnum)
+list_devices(list::LibUSB.DeviceList) = list_devices(stdout, list)
 
-yields the description of device number `devnum`.
-
-"""
-get_description(devnum::Integer) =
-    get_product_string(devnum, PERFORMAX_RETURN_DESCRIPTION)
-
-"""
-    ArcusPerformax.get_product_string(devnum, id)
-
-yields the string identified by `id` for Arcus-Performax device number `devnum`.
-
-"""
-function get_product_string(devnum::Integer, id::Integer)
-    device = find_device(devnum)
-    if is_null(device)
-        throw(ArgumentError("device not found"))
-    end
-    buf = Vector{Cuchar}(undef, PERFORMAX_MAX_DEVICE_STRLEN)
-    handle = open(device) # Open the device.
+function list_devices(io::IO=stdout)
+    list = LibUSB.DeviceList() # Get a list of all connected devices.
     try
-        idx = Int(-1)
-        if id == PERFORMAX_RETURN_SERIAL_NUMBER
-            idx = Int(get_device_descriptor(handle).iSerialNumber)
-        elseif id == PERFORMAX_RETURN_DESCRIPTION
-            idx = Int(get_device_descriptor(handle).iProduct)
-        else
-            throw(ArgumentError("invalid identifier"))
-        end
-        code = Low.libusb_get_string_descriptor_ascii(
-            handle, idx, buf, sizeof(buf))
-        code == 0 || throw_libusb_error(
-            :libusb_get_string_descriptor_ascii, code)
+        list_devices(io, list)
     finally
-        close(handle)
+        close(list) # Unreference and remove items from the list.
     end
-    buf[end] = 0
-    return unsafe_string(pointer(buf))
 end
+
+function list_devices(io::IO, list::LibUSB.DeviceList)
+    devnum = 0
+    for i ∈ eachindex(list)
+        if is_supported_device(list[i])
+            dev = Device(list[i])
+            try
+                print(io, "Arcus Performax device #", devnum, ": Id = \"",
+                      dev("ID"), "\", Name = \"",  dev("DN"), "\"\n")
+            finally
+                close(dev)
+            end
+            devnum += 1
+        end
+    end
+end
+
 
 """
     ArcusPerformax.find_device([list,]devnum) -> dev
