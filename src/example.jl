@@ -8,14 +8,6 @@ function test_device(devnum::Integer = 0)
         println("No motor found")
 	return
     end
-    try
-        println("Serial Number: ", ArcusPerformax.get_serial_number(devnum))
-    catch
-    end
-    try
-        println("Description: ", ArcusPerformax.get_description(devnum))
-    catch
-    end
 
     # Open device (no needs to flush).
     dev = ArcusPerformax.Device(devnum)
