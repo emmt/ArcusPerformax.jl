@@ -61,7 +61,7 @@ commands in Julia:
 
 ```julia
 using Pkg
-pkg"add ArcusPerformax
+pkg"add ArcusPerformax"
 ```
 
 To use my custom registry, execute the following commands (once and before the
